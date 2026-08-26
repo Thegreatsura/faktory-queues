@@ -242,6 +242,11 @@ func hash(pwd, salt string, iterations int) string {
 	return fmt.Sprintf("%x", hash)
 }
 
+const (
+	maxLineLength = 1 << 20
+	idleTimeout   = 30 * time.Second
+)
+
 func startConnection(conn net.Conn, s *Server) *Connection {
 	// Handshake must complete within 2 seconds.
 	// This is a DoS mitigation so clients can't start a handshake
@@ -271,7 +276,7 @@ func startConnection(conn net.Conn, s *Server) *Connection {
 	}
 	_, _ = conn.Write([]byte("\r\n"))
 
-	buf := bufio.NewReader(conn)
+	buf := bufio.NewReader(io.LimitReader(conn, maxLineLength))
 
 	line, err := buf.ReadString('\n')
 	if err != nil {
@@ -370,13 +375,21 @@ func (s *Server) processLines(conn *Connection) {
 		return
 	}
 
+	nc, ok := conn.conn.(net.Conn)
 	for {
+		if ok {
+			_ = nc.SetReadDeadline(time.Now().Add(idleTimeout))
+		}
 		cmd, e := conn.buf.ReadString('\n')
 		if e != nil {
-			if e != io.EOF {
-				util.Error("Unexpected socket error", e)
+			opErr, ok := e.(net.Error)
+			if ok && opErr.Timeout() {
+				return
 			}
-			return
+			if e == io.EOF {
+				return
+			}
+			util.Error("Unexpected socket error", e)
 		}
 		if s.closed {
 			_ = conn.Error("Closing connection", fmt.Errorf("shutdown in progress"))

@@ -2,6 +2,11 @@
 
 Changelog: Faktory || [Faktory Enterprise](https://github.com/contribsys/faktory/blob/main/Ent-Changes.md)
 
+## 1.10.1
+
+- **SECURITY** Authenticated clients could dribble in commands slowly, causing excessive
+  memory usage and creating excessive connections. Connections are now liimted to a 1MB buffer and a 30 second timeout.
+
 ## 1.10.0
 
 - **SECURITY** Clients could push jobs with queue names colliding with other key names
