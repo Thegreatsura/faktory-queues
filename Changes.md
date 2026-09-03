@@ -4,8 +4,9 @@ Changelog: Faktory || [Faktory Enterprise](https://github.com/contribsys/faktory
 
 ## HEAD
 
+- Upgrade to Alpine Linux 3.24
 - Upgrade to Go 1.27
-- Enable Go's runtime monitoring with `pprof` in development mode or if FAKTORY_PPROF=1. Start Faktory locally and hit `http://localhost:7421/debug/pprof`.
+- Enable Go's runtime monitoring with `pprof`. Start Faktory locally and hit `http://localhost:7421/debug/pprof`.
 Note the different port so you can't [expose pprof accidentally](https://mmcloughlin.com/posts/your-pprof-is-showing).
 
 ## 1.10.1
