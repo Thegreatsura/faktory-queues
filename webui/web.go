@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	_ "net/http/pprof"
 	"sync/atomic"
 
 	"strings"
@@ -128,12 +129,6 @@ func newWeb(s *server.Server, opts Options) *WebUI {
 	app.HandleFunc("/busy", Log(ui, busyHandler))
 	app.HandleFunc("/debug", Log(ui, debugHandler))
 	app.HandleFunc("/health", healthHandler(ui))
-
-	// app.HandleFunc("/debug/pprof/", pprof.Index)
-	// app.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-	// app.HandleFunc("/debug/pprof/profile", pprof.Profile)
-	// app.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-	// app.HandleFunc("/debug/pprof/trace", pprof.Trace)
 
 	ui.App = app
 
@@ -268,6 +263,10 @@ func (ui *WebUI) Run() (func(), error) {
 		MaxHeaderBytes: 1 << 16,
 		Handler:        ui.proxy,
 	}
+
+	go func() {
+		util.Error("Default http mux died", http.ListenAndServe("localhost:7421", http.DefaultServeMux))
+	}()
 
 	go func() {
 		var err error

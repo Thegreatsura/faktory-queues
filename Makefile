@@ -71,11 +71,12 @@ dpush: clean generate
 	docker buildx build --platform "linux/arm64,linux/amd64" --tag contribsys/faktory:$(VERSION) --tag contribsys/faktory:latest --push .
 
 drun: ## Run Faktory in a local Docker image, see also "make dimg"
-	docker run --rm -it -e "FAKTORY_SKIP_PASSWORD=true" \
-		-v faktory-data:/var/lib/faktory \
+	docker run --rm -it -e "FAKTORY_SKIP_PASSWORD=true" -e "FAKTORY_PPROF=1" \
+	  -v faktory-data:/var/lib/faktory \
 		-p 127.0.0.1:7419:7419 \
 		-p 127.0.0.1:7420:7420 \
-		contribsys/faktory:latest /faktory -w 0.0.0.0:7420 -b 0.0.0.0:7419 -e production
+		-p 127.0.0.1:7421:7421 \
+		contribsys/faktory:latest /faktory -w 0.0.0.0:7420 -b 0.0.0.0:7419 -l debug -e production
 
 dmon: ## Monitor Redis within the running Docker image
 	docker run --rm -it -t -i \

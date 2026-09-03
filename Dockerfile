@@ -8,7 +8,7 @@ RUN mkdir -p /.faktory/db
 RUN mkdir -p /var/lib/faktory/db
 RUN mkdir -p /etc/faktory
 
-EXPOSE 7419 7420
+EXPOSE 7419 7420 7421
 
 RUN chgrp -R 0 /var/lib/faktory && \
     chmod -R g=u /var/lib/faktory && \
