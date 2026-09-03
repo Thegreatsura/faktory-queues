@@ -83,8 +83,9 @@ func bootRedis(path string, sock string) (func() error, error) {
 	}
 
 	rclient := redis.NewClient(&redis.Options{
-		Network: "unix",
-		Addr:    sock,
+		Network:    "unix",
+		Addr:       sock,
+		MaxRetries: -1,
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
